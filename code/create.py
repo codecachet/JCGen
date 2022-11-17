@@ -34,8 +34,7 @@ def doit():
 
 
     context = {
-        "n_desk_columns" : n_desk_columns,
-        "n_mobile_columns" : n_mobile_columns,
+        "gallery_title" : "Jack",
         "desk_columns" : desk_columns,
         "mobile_columns" : mobile_columns,
         "siteurl" : "",
@@ -74,7 +73,10 @@ def create_columns(imagelist, n_columns):
 def get_imagelist():
     with open("imagelist.txt", "r") as f:
         images = f.readlines()
-    images = [image.strip() for image in images]
+    images = [{ "name": image.strip(), "title":f"jack_{i}"} for i,image in enumerate(images)]
+    print("images=", images)
+
+
     return images
 
 def write_to_file(str, name, dir):

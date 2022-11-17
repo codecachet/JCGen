@@ -85,8 +85,6 @@
                 <div class="menu">         
                         <a class="" href="/home/">home</a>
                          /
-                        <a class="active" href="/tags/jack/">jack</a>
-                         / 
                         <a class="" href="/about">about</a>
                 </div>
     </div>
@@ -99,6 +97,10 @@
     </div>
 </nav>
 
+<div class="gallery-title">
+{{ gallery_title }}
+</div>
+
 <section id="desktop" class="section work">
 	<div class="center hidden-menu">
     </div>
@@ -107,18 +109,20 @@
 <div class="columns work-width ">
 {% for column in desk_columns %}
  <div class="column">
-{% for imagename in column %}
+{% for image in column %}
        
                     <div class="center">
                         <div class="image-box ">
                             <img
-                            src="{{ imageurl }}/Jack/{{ imagename }}"
+                            src="{{ imageurl }}/Jack/{{ image.name }}"
                             loading="lazy"
                             width="512"
                             height="512"
                             onclick="openSlider();currentSlide( 1 )"
                             />
+                            <span class="image_title">{{ image.title }}</span>
                         </div>
+                        
                     </div>
         
 {% endfor %}
@@ -136,16 +140,17 @@
 <div class="columns work-width  is-mobile is-multiline ">
 {% for column in mobile_columns %}
         <div class="column">
-{% for imagename in column %}
+{% for image in column %}
                     <div class="center">
                         <div class="image-box  alittle ">
                             <img
-                            src="{{ imageurl }}/Jack/{{ imagename }}"
+                            src="{{ imageurl }}/Jack/{{ image.name }}"
                             loading="lazy"
                             width="512"
                             height="512"
                             onclick="openSlider();currentSlide( 1 )"
                             />
+                            <span class="image_title">{{ image.title }}</span>
                         </div>
                     </div>
                     {% endfor %}
@@ -161,7 +166,7 @@
             All rights reserved. <br>
         
         
-            © 2022 JumpingCow.xyz.
+            © 2022 JumpingCow.xyz
         
     </p>
     

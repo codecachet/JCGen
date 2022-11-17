@@ -38,6 +38,7 @@
     justify-content: center;
     position: absolute;
     z-index: -9;
+    text-align: center;
 }
 
 .socials {
@@ -384,6 +385,12 @@ section .column img {
     border-radius: 4px;
     transform: rotateZ(45deg);
     color: var(--grey);
+}
+
+.gallery-title {
+    font-size: 5em;
+    color: orange;
+    text-align: center;
 }
 
 .hidden {
