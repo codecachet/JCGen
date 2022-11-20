@@ -20,7 +20,7 @@
 
 .welcome-title {
     text-align: center;
-    font-size: 2em;
+    font-size: 1.5em;
 }
 
 .welcome-subtitle {
@@ -88,7 +88,7 @@ nav.navbar {
     background-color: var(--dark);
     justify-content: people-between;
     align-items: center;
-    height: 6rem;
+    height: 18rem;
     margin-left: 2em;
     margin-right: 2em;
     padding-top: 1em;

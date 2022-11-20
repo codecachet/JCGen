@@ -11,6 +11,24 @@ public_dir = os.path.join(top, "public")
 css_dir_src = os.path.join(top, "static", "css")
 css_dir_dst = os.path.join(public_dir, "css")
 
+img_dir_src = os.path.join(top, "static", "img")
+img_dir_dst = os.path.join(public_dir, "img")
+
+"""
+Jack
+Trains
+Watches
+Crow
+Window
+Abstract
+Musicality
+House
+Aliens
+SpaceWar
+Running
+Coffee
+
+"""
 
 def doit():
     env = Environment(
@@ -18,7 +36,7 @@ def doit():
         autoescape=select_autoescape()
     )
 
-    template = env.get_template("main1.j2")
+    template = env.get_template("main.j2")
 
     imagelist = get_imagelist()
     print("imagelist=", imagelist)
@@ -48,6 +66,7 @@ def doit():
     write_to_file(x, "index.html", public_dir)
 
     copy_dir_contents(css_dir_src, css_dir_dst)
+    copy_dir_contents(img_dir_src, img_dir_dst)
     
 def create_columns(imagelist, n_columns):
     the_columns = []
