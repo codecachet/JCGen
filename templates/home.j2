@@ -2,7 +2,7 @@
 
 {% block menu %}
          <div class="menu">         
-                        <a class="" href="/home/">home</a>
+                        <a class="active" href="/home/">home</a>
                          /
                         <a class="" href="/about">about</a>
                 </div>
@@ -11,7 +11,7 @@
 {% block content %}
 
 <div class="gallery-title">
-{{ gallery_title }}
+Galleries
 </div>
 
 <section id="desktop" class="section work">
@@ -22,18 +22,20 @@
 <div class="columns work-width ">
 {% for column in desk_columns %}
  <div class="column">
-{% for image in column %}
+{% for gallery in column %}
        
                     <div class="center">
                         <div class="image-box ">
+                        <a href="gallery_{{ gallery.name }}.html">
                             <img
-                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.name }}"
+                            src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}"
                             loading="lazy"
                             width="512"
                             height="512"
                             onclick="openSlider();currentSlide( 1 )"
                             />
-                            <span class="image_title">{{ image.title }}</span>
+                        </a>
+                            <span class="image_title">{{ gallery.title }}</span>
                         </div>
                         
                     </div>
@@ -53,17 +55,19 @@
 <div class="columns work-width  is-mobile is-multiline ">
 {% for column in mobile_columns %}
         <div class="column">
-{% for image in column %}
+{% for gallery in column %}
                     <div class="center">
                         <div class="image-box  alittle ">
+                        <a href="gallery_{{ gallery.name }}.html">
                             <img
-                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.name }}"
+                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ home_image_name }}"
                             loading="lazy"
                             width="512"
                             height="512"
                             onclick="openSlider();currentSlide( 1 )"
                             />
-                            <span class="image_title">{{ image.title }}</span>
+                            </a>
+                            <span class="image_title">{{ gallery.title }}</span>
                         </div>
                     </div>
                     {% endfor %}
