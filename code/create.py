@@ -3,8 +3,9 @@
 import os
 import shutil
 import requests 
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 import json
+from tinydb import TinyDB, Query
 
 from jinja2 import Environment, PackageLoader, FileSystemLoader, select_autoescape
 
@@ -50,10 +51,13 @@ train
 """
 
 WEB_IMAGE_URL = "http://192.168.1.178:8002"
-SRC_IMAGE_URL = "http://192.168.1.178:3020"
+#SRC_IMAGE_URL = "http://192.168.1.178:3020"
+SRC_IMAGE_URL = "http://192.168.1.178:8002"
 
 N_DESK_COLUMNS = 3
 N_MOBILE_COLUMNS = 1
+
+image_db_path = "image_db.json"
 
 galleries = [
     {
@@ -180,6 +184,11 @@ galleries = [
 
 
 def doit():
+
+    db = TinyDB(image_db_path)
+
+    # delete all
+    db.truncate()
     
     for gallery in galleries:
         
@@ -189,14 +198,22 @@ def doit():
         else:
             continue """
         
-        gallery_page(gallery)
+        gallery_page(db, gallery)
     
     home_page()
     
     copy_dir_contents(css_dir_src, css_dir_dst)
     copy_dir_contents(img_dir_src, img_dir_dst)
 
-def gallery_page(gallery):
+    print("db len=", len(db.all()))
+    print_db(db)
+
+def print_db(db):
+    docs = db.all()
+    for doc in docs:
+        print("doc=", doc)
+
+def gallery_page(db, gallery):
     env = Environment(
         loader=FileSystemLoader("../templates/"),
         autoescape=select_autoescape()
@@ -206,6 +223,8 @@ def gallery_page(gallery):
 
     imagelist = get_imagelist(gallery)
     print("imagelist=", imagelist)
+
+    insert_imagelist_into_db(gallery, db, imagelist)
 
     n_desk_columns = gallery["n_desk_columns"]
     n_mobile_columns = gallery["n_mobile_columns"]
@@ -265,7 +284,17 @@ def home_page():
     write_to_file(x, "index.html", public_dir)
 
        
-    
+def insert_imagelist_into_db(gallery, db, imagelist):
+    for i, image in enumerate(imagelist):
+        rec = {
+            'gallery_name' : gallery['name'],
+            'src_image_name' : image['name'],
+            'src_image_loc' : gallery['imageurl_subdir'],
+            'dst_image_name' : f"{gallery['name']}_{i:03d}"
+        } 
+        db.insert(rec)
+
+
 def create_columns(imagelist, n_columns):
     the_columns = []
     for c in range(n_columns):
@@ -328,10 +357,11 @@ def get_imagelist_default(gallery):
     return images
 
 
+"""
 def parse_response_old(html):
-    """
-    convert li's to list
-    """
+   
+    #convert li's to list
+   
     soup = BeautifulSoup(html, 'html.parser')
     print("soup=", soup)
     items = soup.find_all('li')
@@ -340,6 +370,7 @@ def parse_response_old(html):
         print("text=", item.text)
     images = [item.text for item in items]
     return images
+"""
 
 def parse_response(json_str):
     return json.loads(json_str)
