@@ -271,12 +271,12 @@ def db_summary():
         size = sum([image['image_size'] for image in images])
         print(f"Gallery: {gallery}")
         print(f"  n = {n}")
-        print(f"  size = {size} bytes")
+        print(f"  size = {size:,} bytes ({size / 1000000 :.1f} mb)")
         total_size += size
         total_n += n
-    print(f"Total n = {total_n}")
-    print(f"Total size={total_size}")
-    print(f"Average file size={total_size / total_n}")
+    print(f"Total n = {total_n:,}")
+    print(f"Total size={total_size:,} bytes ({total_size / 1000000 :.1f} mb)")
+    print(f"Average file size={total_size / total_n :,.0f}")
 
 
 def get_galleries(db):
