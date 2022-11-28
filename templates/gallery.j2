@@ -27,14 +27,18 @@
                     <div class="center">
                         <div class="image-box ">
                             <img
+                            {% if mode == "local" %}
                             src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.name }}"
+                            {% else %}
+                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.remote_name }}"
+                            {% endif %}
                             loading="lazy"
                             width="512"
                             height="512"
                             onclick="openSlider();currentSlide( 1 )"
                             />
                             <span class="image_title">{{ image.title }}</span>
-                            {% if print_image_name %}
+                            {% if show_image_name %}
                             <br /> {{ image.name }}
                             {% endif %}
                         </div>

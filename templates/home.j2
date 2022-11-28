@@ -28,7 +28,13 @@ Galleries
                         <div class="image-box ">
                         <a href="gallery_{{ gallery.name }}.html">
                             <img
-                            src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}"
+                            {% if mode == "local" %}
+                            src="{{ imageurl }}/{{ gallery.src_imageurl_subdir }}/{{ gallery.home_image_name }}"
+                            {% else %}
+                            src="{{ imageurl }}/{{ mode }}/{{ gallery.home_image_name }}"
+                            {% endif %}
+
+                            {# src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}" #}
                             loading="lazy"
                             width="512"
                             height="512"
@@ -36,6 +42,7 @@ Galleries
                             />
                         </a>
                             <span class="image_title">{{ gallery.title }}</span>
+                            <span>({{ gallery.n_images }} images)</span>
                         </div>
                         
                     </div>
