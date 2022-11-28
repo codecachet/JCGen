@@ -263,14 +263,29 @@ def db_summary():
     """
     db = TinyDB(image_db_path)
     galleries = get_galleries(db)
-    
+    total_size = 0
+    total_n = 0
+    for gallery in galleries:
+        images = db.search(where('gallery_name') == gallery)
+        n = len(images)
+        size = sum([image['image_size'] for image in images])
+        print(f"Gallery: {gallery}")
+        print(f"  n = {n}")
+        print(f"  size = {size} bytes")
+        total_size += size
+        total_n += n
+    print(f"Total n = {total_n}")
+    print(f"Total size={total_size}")
+    print(f"Average file size={total_size / total_n}")
+
+
 def get_galleries(db):
     docs = db.all()
     galleries = [doc['gallery_name'] for doc in docs]
     print("galleries=", galleries)
     uniques = list(set(galleries))
     print("uniques=", uniques)
-
+    return uniques
 
 
 def gallery_page(db, gallery, mode, show_image_name):
