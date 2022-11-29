@@ -1,6 +1,11 @@
 title = "Galleries"
 
 #[galleries]
+[galleries.abstract]
+title = "Abstractions"
+src_imageurl_subdir = "Abstract"
+home_image_name = "000128.1111633936.png"
+date_updated = 2022-11-28
 
 [galleries.jack]
 title = "JackO"
@@ -8,14 +13,39 @@ src_imageurl_subdir = "Jack"
 home_image_name = "000187.2732763625.png"
 date_updated = 2022-11-28
 
-[galleries.abstract]
-title = "Abstractions"
-src_imageurl_subdir = "swift_output/abstract"
-home_image_name = "abstract_56.png"
+[galleries.house]
+title = "House"
+src_imageurl_subdir = "House"
+home_image_name = "000025.1277975586.png"
 date_updated = 2022-11-28
 
 [galleries.spacewar]
 title = "SpaceWar"
+src_imageurl_subdir = "SpaceWar"
+home_image_name = "000112.2344471161.png"
+date_updated = 2022-11-28
+
+[galleries.watches]
+title = "Watches"
+src_imageurl_subdir = "Watches"
+home_image_name = "000226.1428379882.png"
+date_updated = 2022-11-28
+
+[galleries.window]
+title = "Window"
+src_imageurl_subdir = "Window"
+home_image_name = "000002.330931084.png"
+date_updated = 2022-11-28
+
+
+[galleries.abstract2]
+title = "Abstractions 2"
+src_imageurl_subdir = "swift_output/abstract"
+home_image_name = "abstract_56.png"
+date_updated = 2022-11-28
+
+[galleries.spacewar2]
+title = "SpaceWar 2"
 src_imageurl_subdir = "swift_output/spacewar"
 home_image_name = "cool_90.png"
 date_updated = 2022-11-28
@@ -26,8 +56,8 @@ src_imageurl_subdir = "swift_output/robot"
 home_image_name = "koi_41.png"
 date_updated = 2022-11-28
 
-[galleries.house]
-title = "House"
+[galleries.house2]
+title = "House 2"
 src_imageurl_subdir = "swift_output/house"
 home_image_name = "cool_112.png"
 date_updated = 2022-11-28
@@ -62,8 +92,33 @@ src_imageurl_subdir = "swift_output/train"
 home_image_name = "cool_254.png"
 date_updated = 2022-11-28
 
-[galleries.abstract2]
-title = "Abstractions 2"
-src_imageurl_subdir = "Abstract"
-home_image_name = "000128.1111633936.png"
+[galleries.cars]
+title = "Cars from the 60's"
+src_imageurl_subdir = "icloud_downloads/cars"
+home_image_name = "1960 car driving down a lovely country road, by Michael cheval.png"
 date_updated = 2022-11-28
+
+[galleries.music2]
+title = "Music 2"
+src_imageurl_subdir = "icloud_downloads/music"
+home_image_name = "3622829725_Guitar__grand_piano__trumpets__ocean_foam__cubes__cones__cylinders__abstract_art__George_Braque__peter_elson___3d.png"
+date_updated = 2022-11-28
+
+[galleries.alien]
+title = "Alien"
+src_imageurl_subdir = "icloud_downloads/alien"
+home_image_name = "Giant Bulbous mri machine with huge glowing plasma core, cheese refinery, space station interior,beeple, Chris foss, John harris.png"
+date_updated = 2022-11-28
+
+[galleries.birdhouse]
+title = "Bird House"
+src_imageurl_subdir = "icloud_downloads/birdhouse"
+home_image_name = "1392945552_woodpecker_pecking_on_cedar_siding_of_a_fine_old_house__colorful__beautiful__artstation__beeple.png"
+date_updated = 2022-11-28
+
+[galleries.robot2]
+title = "Robot 2"
+src_imageurl_subdir = "icloud_downloads/robot"
+home_image_name = "3435539773_A_bunch_of_robotic_dragonflies__by_Peter_elson.png"
+date_updated = 2022-11-28
+
