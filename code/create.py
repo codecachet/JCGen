@@ -7,6 +7,7 @@ import requests
 import json
 from tinydb import TinyDB, Query, where
 import argparse
+import tomli
 
 from jinja2 import Environment, PackageLoader, FileSystemLoader, select_autoescape
 
@@ -47,9 +48,6 @@ icloud_downloads
  cars
  music (2)
  robot (2)
- 
-
-
 """
 
 WEB_IMAGE_URL = "http://192.168.1.178:8002"   # serves images, plain and simple. This will be changed to, say, AWS
@@ -82,140 +80,11 @@ options:
 
 #mode = "LOCAL"   # or "REMOTE"
 
-galleries = [
-    {
-        "name": "jack",
-        "title": "JackO",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "Jack",
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "Jack",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "000187.2732763625.png",
-
-    },
-    {
-        "name": "abstract",
-        "title": "Abstractions",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/abstract", # note: swift_output is temp, for testing
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/abstract",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "abstract_56.png"
-    },
-    {
-        "name": "spacewar",
-        "title": "SpaceWar",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/spacewar", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/spacewar",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "cool_90.png"
-    },
-    {
-        "name": "robot",
-        "title": "Bot",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/robot", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/robot",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "koi_41.png"
-    },
-    {
-        "name": "house",
-        "title": "House",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/house", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/house",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "cool_112.png"
-    },
-    {
-        "name": "music",
-        "title": "Music",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/music", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/music",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "cool_44.png"
-    },
-    {
-        "name": "surfing",
-        "title": "Surfing",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/surfing", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/surfing",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "cool_20.png"
-    },
-    {
-        "name": "city",
-        "title": "City",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/city", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/city",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "cool_155.png"
-    },
-    {
-        "name": "owl",
-        "title": "Owl",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/owl", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/owl",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "cool_27.png"
-    },
-    {
-        "name": "train",
-        "title": "Cosmic Train",
-        "imageurl": WEB_IMAGE_URL,
-        "imageurl_subdir": "swift_output/train", 
-        "get_imagelist": "get_imagelist_default",
-        "src_imageurl" : SRC_IMAGE_URL,
-        "src_imageurl_subdir" : "swift_output/train",
-        "n_desk_columns": N_DESK_COLUMNS,
-        "n_mobile_columns": N_MOBILE_COLUMNS,
-        "home_image_name" : "cool_254.png"
-    },
-    {
-        "name": "abstract2",
-        "title": "Abstractions 2",
-        "src_imageurl_subdir" : "Abstract",
-        "home_image_name" : "000128.1111633936.png", 
-        #"home_image_name_subdir" : "Abstract",  #if we allow src_image_subdir to be a list, need to specify here which one
-    }
-
-]
+galleries = None
 
 
 def create_site(gallery_names, mode, show_image_name):
+    init_config()
 
     db = TinyDB(image_db_path)
 
@@ -536,6 +405,25 @@ def get_image_url_subdir(gallery, mode):
 def get_remote_name(gallery, i):
     return f"{gallery['name']}_{i:03d}"
 
+def init_config():
+    with open("galleries.toml", mode="rb") as fp:
+       config = tomli.load(fp)
+    print("config =", config)
+
+    config_galleries = config['galleries']
+
+    global galleries
+    galleries = []
+
+    for name, gallery in config_galleries.items():
+        print("gallery=", gallery)
+        gallery['name'] = name
+        galleries.append(gallery)
+    print("galleries=", galleries)
+
+    
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='Generate static pages')
@@ -546,7 +434,7 @@ def main():
     #                    help='sum the integers (default: find the max)')
 
     #parser.add_argument('--create', action='store_true' )
-    parser.add_argument('operation', choices=['create', 'listdb', 'summary'])  # default='create', nargs='?' )
+    parser.add_argument('operation', choices=['create', 'listdb', 'summary', 'toml'])  # default='create', nargs='?' )
     parser.add_argument('--gallery', default='all', nargs='*')
     parser.add_argument('--mode', choices=['local', 'remote'], default='local', nargs='?')
     parser.add_argument('--show_image_name', action='store_true')
@@ -563,6 +451,8 @@ def main():
         list_db()
     elif args.operation == "summary":
         db_summary()
+    elif args.operation == "toml":
+        init_config()
     else:
         print("ERROR: need operation")
 

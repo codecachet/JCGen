@@ -393,6 +393,12 @@ section .column img {
     text-align: center;
 }
 
+.gallery-subtitle {
+    font-size: 1.5em;
+    color: orange;
+    text-align: center;
+}
+
 .hidden {
     opacity: 0;
     transition: opacity 250ms ease-in-out;

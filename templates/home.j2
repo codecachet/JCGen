@@ -41,8 +41,11 @@ Galleries
                             onclick="openSlider();currentSlide( 1 )"
                             />
                         </a>
-                            <span class="image_title">{{ gallery.title }}</span>
-                            <span>({{ gallery.n_images }} images)</span>
+                            
+                            <p class="gallery-subtitle">{{ gallery.title }} </p>
+                            <p>{{ gallery.n_images }} images </p>
+                            <p>Last Updated: {{ gallery.date_updated }}</p>
+                          
                         </div>
                         
                     </div>

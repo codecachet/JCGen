@@ -1,0 +1,69 @@
+title = "Galleries"
+
+#[galleries]
+
+[galleries.jack]
+title = "JackO"
+src_imageurl_subdir = "Jack"
+home_image_name = "000187.2732763625.png"
+date_updated = 2022-11-28
+
+[galleries.abstract]
+title = "Abstractions"
+src_imageurl_subdir = "swift_output/abstract"
+home_image_name = "abstract_56.png"
+date_updated = 2022-11-28
+
+[galleries.spacewar]
+title = "SpaceWar"
+src_imageurl_subdir = "swift_output/spacewar"
+home_image_name = "cool_90.png"
+date_updated = 2022-11-28
+
+[galleries.robot]
+title = "Bots"
+src_imageurl_subdir = "swift_output/robot"
+home_image_name = "koi_41.png"
+date_updated = 2022-11-28
+
+[galleries.house]
+title = "House"
+src_imageurl_subdir = "swift_output/house"
+home_image_name = "cool_112.png"
+date_updated = 2022-11-28
+
+[galleries.music]
+title = "Music"
+src_imageurl_subdir = "swift_output/music"
+home_image_name = "cool_44.png"
+date_updated = 2022-11-28
+
+[galleries.surfing]
+title = "Surfing"
+src_imageurl_subdir = "swift_output/surfing"
+home_image_name = "cool_20.png"
+date_updated = 2022-11-28
+
+[galleries.city]
+title = "City"
+src_imageurl_subdir = "swift_output/city"
+home_image_name = "cool_155.png"
+date_updated = 2022-11-28
+
+[galleries.owl]
+title = "Owl"
+src_imageurl_subdir = "swift_output/owl"
+home_image_name = "cool_27.png"
+date_updated = 2022-11-28
+
+[galleries.train]
+title = "Cosmic Train"
+src_imageurl_subdir = "swift_output/train"
+home_image_name = "cool_254.png"
+date_updated = 2022-11-28
+
+[galleries.abstract2]
+title = "Abstractions 2"
+src_imageurl_subdir = "Abstract"
+home_image_name = "000128.1111633936.png"
+date_updated = 2022-11-28
