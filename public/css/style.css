@@ -101,6 +101,7 @@ nav.navbar {
 
 .menu {
     max-width: 600px;
+    text-align: center;
 }
 
 .margin-bottom-50 {
@@ -388,7 +389,7 @@ section .column img {
 }
 
 .gallery-title {
-    font-size: 5em;
+    font-size: 3em;
     color: orange;
     text-align: center;
 }

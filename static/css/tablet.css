@@ -66,4 +66,7 @@
     .work-width {
         width: unset;
     }
+    .gallery-title {
+        padding-top: .5em;
+    }
 }

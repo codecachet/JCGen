@@ -2,7 +2,7 @@
 
 {% block menu %}
          <div class="menu">         
-                        <a class="active" href="/home/">home</a>
+                        <a class="active" href="/">home</a>
                          /
                         <a class="" href="/about">about</a>
                 </div>
@@ -26,25 +26,25 @@ Galleries
        
                     <div class="center">
                         <div class="image-box ">
-                        <a href="gallery_{{ gallery.name }}.html">
-                            <img
-                            {% if mode == "local" %}
-                            src="{{ imageurl }}/{{ gallery.src_imageurl_subdir }}/{{ gallery.home_image_name }}"
-                            {% else %}
-                            src="{{ imageurl }}/{{ mode }}/{{ gallery.home_image_name }}"
-                            {% endif %}
+                            <a href="gallery_{{ gallery.name }}.html">
+                                <img
+                                {% if mode == "local" %}
+                                src="{{ imageurl }}/{{ gallery.src_imageurl_subdir }}/{{ gallery.home_image_name }}"
+                                {% else %}
+                                src="{{ imageurl }}/{{ mode }}/{{ gallery.home_image_name }}"
+                                {% endif %}
 
-                            {# src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}" #}
-                            loading="lazy"
-                            width="512"
-                            height="512"
-                            onclick="openSlider();currentSlide( 1 )"
-                            />
-                        </a>
-                            
-                            <p class="gallery-subtitle">{{ gallery.title }} </p>
-                            <p>{{ gallery.n_images }} images </p>
-                            <p>Last Updated: {{ gallery.date_updated }}</p>
+                                {# src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}" #}
+                                loading="lazy"
+                                width="512"
+                                height="512"
+                                onclick="openSlider();currentSlide( 1 )"
+                                />
+                            </a>
+                                
+                                <p class="gallery-subtitle">{{ gallery.title }} </p>
+                                <p>{{ gallery.n_images }} images </p>
+                                <p>Last Updated: {{ gallery.date_updated }}</p>
                           
                         </div>
                         
@@ -68,16 +68,26 @@ Galleries
 {% for gallery in column %}
                     <div class="center">
                         <div class="image-box  alittle ">
-                        <a href="gallery_{{ gallery.name }}.html">
-                            <img
-                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ home_image_name }}"
-                            loading="lazy"
-                            width="512"
-                            height="512"
-                            onclick="openSlider();currentSlide( 1 )"
-                            />
+
+                            <a href="gallery_{{ gallery.name }}.html">
+                                <img
+                                {% if mode == "local" %}
+                                src="{{ imageurl }}/{{ gallery.src_imageurl_subdir }}/{{ gallery.home_image_name }}"
+                                {% else %}
+                                src="{{ imageurl }}/{{ mode }}/{{ gallery.home_image_name }}"
+                                {% endif %}
+
+                                {# src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}" #}
+                                loading="lazy"
+                                width="512"
+                                height="512"
+                                onclick="openSlider();currentSlide( 1 )"
+                                />
                             </a>
-                            <span class="image_title">{{ gallery.title }}</span>
+                                
+                                <p class="gallery-subtitle">{{ gallery.title }} </p>
+                                <p>{{ gallery.n_images }} images </p>
+                                <p>Last Updated: {{ gallery.date_updated }}</p>
                         </div>
                     </div>
                     {% endfor %}

@@ -21,6 +21,9 @@ css_dir_dst = os.path.join(public_dir, "css")
 img_dir_src = os.path.join(top, "static", "img")
 img_dir_dst = os.path.join(public_dir, "img")
 
+font_dir_src = Path(top) / 'static' / 'fonts'
+font_dir_dst = Path(top) / public_dir / 'fonts'
+
 """
 top (rel to img-samples)
  Abstract
@@ -113,6 +116,7 @@ def create_site(gallery_names, mode, show_image_name):
     
     copy_dir_contents(css_dir_src, css_dir_dst)
     copy_dir_contents(img_dir_src, img_dir_dst)
+    copy_dir_contents(font_dir_src, font_dir_dst)
 
     #copy_public_to_mac()
     # copy public to mac shared directory
