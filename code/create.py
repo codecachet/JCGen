@@ -8,6 +8,7 @@ import json
 from tinydb import TinyDB, Query, where
 import argparse
 import tomli
+from pathlib import Path
 
 from jinja2 import Environment, PackageLoader, FileSystemLoader, select_autoescape
 
@@ -113,8 +114,31 @@ def create_site(gallery_names, mode, show_image_name):
     copy_dir_contents(css_dir_src, css_dir_dst)
     copy_dir_contents(img_dir_src, img_dir_dst)
 
+    #copy_public_to_mac()
+    # copy public to mac shared directory
+    
+
     #print("db len=", len(db.all()))
    
+def copy_public_to_mac():
+    src_public = public_dir
+    dst_public = Path('/media/psf/parallels_ubuntu_shared/') / 'jcgen_public'
+
+    if dst_public.exists():
+        for file in dst_public.iterdir():
+            print(f"file={file}")
+        
+        shutil.rmtree(dst_public)
+
+    #for file in dst_public.iterdir():
+    #    print(f"file={file}")
+    
+    shutil.copytree(src_public, dst_public)
+
+    for file in dst_public.iterdir():
+        print(f"file={file}")
+
+
 
 def list_db():
     db = TinyDB(image_db_path)
@@ -434,7 +458,7 @@ def main():
     #                    help='sum the integers (default: find the max)')
 
     #parser.add_argument('--create', action='store_true' )
-    parser.add_argument('operation', choices=['create', 'listdb', 'summary', 'toml'])  # default='create', nargs='?' )
+    parser.add_argument('operation', choices=['create', 'listdb', 'summary', 'toml', 'copy_to_mac'])  # default='create', nargs='?' )
     parser.add_argument('--gallery', default='all', nargs='*')
     parser.add_argument('--mode', choices=['local', 'remote'], default='local', nargs='?')
     parser.add_argument('--show_image_name', action='store_true')
@@ -453,6 +477,8 @@ def main():
         db_summary()
     elif args.operation == "toml":
         init_config()
+    elif args.operation == 'copy_to_mac':
+        copy_public_to_mac()
     else:
         print("ERROR: need operation")
 
