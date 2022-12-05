@@ -9,8 +9,12 @@ from tinydb import TinyDB, Query, where
 import argparse
 import tomli
 from pathlib import Path
+import tempfile
 
 from jinja2 import Environment, PackageLoader, FileSystemLoader, select_autoescape
+
+# remote image storage
+import cloudinary_utils
 
 top = "/home/dg/projects/JCGen/"
 public_dir = os.path.join(top, "public")
@@ -62,7 +66,10 @@ local_image_url = "http://192.168.1.178:8002"
 
 aws_bucket = "jumpingcow-images"
 
-remote_image_url = f"https://{ aws_bucket }.s3.amazonaws.com"
+remote_image_url_amazon = f"https://{ aws_bucket }.s3.amazonaws.com"
+remote_image_url_cloudinary = "https://res.cloudinary.com/jumpingcow/image/upload"
+
+remote_image_url = remote_image_url_cloudinary
 
 N_DESK_COLUMNS = 3
 N_MOBILE_COLUMNS = 1
@@ -112,7 +119,7 @@ def create_site(gallery_names, mode, show_image_name):
         print("DOING gallery =", gallery['name'])
         gallery_page(db, gallery, mode, show_image_name)
     
-    home_page(db, mode)
+    ####home_page(db, mode)
     
     copy_dir_contents(css_dir_src, css_dir_dst)
     copy_dir_contents(img_dir_src, img_dir_dst)
@@ -449,8 +456,66 @@ def init_config():
         galleries.append(gallery)
     print("galleries=", galleries)
 
-    
+def get_gallery(gallery_name):
+    for gallery in galleries:
+        if gallery['name'] == gallery_name:
+            return gallery
+    return None
 
+def get_image_to_local_file(image):
+    src_imageurl = WEB_IMAGE_URL
+
+    src_subdir = image['src_image_loc']
+    src_image_name = image['src_image_name']
+
+    url = f"{src_imageurl}/{src_subdir}/{src_image_name}"
+    print("url=", url)
+   
+    response = requests.get(url)
+    print("status=", response.status_code)
+    print("encoding=", response.encoding)
+    print("content-type", response.headers['content-type'])
+    #print("text=", response.text)
+
+    #print("response=", response)
+
+    if response.status_code != 200:
+        print(f"ERROR: status={response.status_code}")
+        return None
+    # save as a tmp file
+    #with open("/tmp/abc.png", "wb") as f:
+    #    f.write(response.content)
+
+
+    (f, tempfile_name) = tempfile.mkstemp()
+    fd = os.fdopen(f, "wb")
+    fd.write(response.content)
+    fd.close()
+    print("tempfile_name=", tempfile_name)
+    return tempfile_name
+
+
+def upload(gallery_name = 'house'):
+    init_config()
+    #gallery_name = 'house'
+    print('gallery_name=', gallery_name)
+    gallery_name = 'house'
+    gallery = get_gallery(gallery_name)
+    print("gallery=", gallery)
+    names = [gallery['name'] for gallery in galleries]
+    print('names=', names)
+
+    db = TinyDB(image_db_path)
+
+    images = db.search(where('gallery_name') == gallery_name)
+    print("images=", images)
+
+    for image in images:
+        tmp_file_name = get_image_to_local_file(image)
+        print("tmp_file_name", tmp_file_name)
+
+        #assume cloudinary for now
+        result = cloudinary_utils.upload_image(image, tmp_file_name)
 
 def main():
 
@@ -462,7 +527,7 @@ def main():
     #                    help='sum the integers (default: find the max)')
 
     #parser.add_argument('--create', action='store_true' )
-    parser.add_argument('operation', choices=['create', 'listdb', 'summary', 'toml', 'copy_to_mac'])  # default='create', nargs='?' )
+    parser.add_argument('operation', choices=['create', 'listdb', 'summary', 'toml', 'copy_to_mac', 'upload'])  # default='create', nargs='?' )
     parser.add_argument('--gallery', default='all', nargs='*')
     parser.add_argument('--mode', choices=['local', 'remote'], default='local', nargs='?')
     parser.add_argument('--show_image_name', action='store_true')
@@ -473,6 +538,7 @@ def main():
 
     if args.operation == "create":
         print("args.gallery=", args.gallery)
+        print("args.mode=", args.mode)
         create_site(args.gallery, args.mode, args.show_image_name)
         #pass
     elif args.operation == "listdb":
@@ -483,6 +549,8 @@ def main():
         init_config()
     elif args.operation == 'copy_to_mac':
         copy_public_to_mac()
+    elif args.operation == 'upload':
+        upload(args.gallery)
     else:
         print("ERROR: need operation")
 
