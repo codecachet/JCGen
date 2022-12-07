@@ -6,6 +6,8 @@ import requests
 #from bs4 import BeautifulSoup
 import json
 from tinydb import TinyDB, Query, where
+from MyDB import MyDB
+
 import argparse
 import tomli
 from pathlib import Path
@@ -97,10 +99,14 @@ galleries = None
 def create_site(gallery_names, mode, show_image_name):
     init_config()
 
-    db = TinyDB(image_db_path)
+    mydb = MyDB(image_db_path)
+    t_image = mydb.get_table('image')
+
+    #db = t_image
 
     # delete all
-    db.truncate()
+    t_image.truncate()
+
 
     print("gallery_names=", gallery_names)
 
@@ -117,7 +123,7 @@ def create_site(gallery_names, mode, show_image_name):
 
     for gallery in gallery_list:
         print("DOING gallery =", gallery['name'])
-        gallery_page(db, gallery, mode, show_image_name)
+        gallery_page(t_image, gallery, mode, show_image_name)
     
     ####home_page(db, mode)
     
@@ -151,9 +157,11 @@ def copy_public_to_mac():
 
 
 
-def list_db():
-    db = TinyDB(image_db_path)
-    docs = db.all()
+def list_db(table_name='image'):
+    #db = TinyDB(image_db_path)
+    mydb = MyDB(image_db_path)
+    image_t = mydb.get_table(table_name)
+    docs = image_t.all()
     for doc in docs:
         print("doc=", doc)
 
@@ -165,12 +173,14 @@ def db_summary():
     total files
     total size
     """
-    db = TinyDB(image_db_path)
-    galleries = get_galleries(db)
+    #db = TinyDB(image_db_path)
+    mydb = MyDB(image_db_path)
+    image_t = mydb.get_table('image')
+    galleries = get_galleries(image_t)
     total_size = 0
     total_n = 0
     for gallery in galleries:
-        images = db.search(where('gallery_name') == gallery)
+        images = image_t.search(where('gallery_name') == gallery)
         n = len(images)
         size = sum([image['image_size'] for image in images])
         print(f"Gallery: {gallery}")
@@ -310,7 +320,12 @@ def insert_imagelist_into_db(gallery, db, imagelist):
             'src_image_loc' : gallery.get('imageurl_subdir', gallery['src_imageurl_subdir']),
             'dst_image_name' : get_remote_name(gallery, i),
             'image_size' : image['size'],
+            'remote_url' : None,
+            'is_active' : True,
+            'flubber' : 'blue',
         } 
+        print('inserting rec=', rec)
+
         db.insert(rec)
 
 
@@ -556,3 +571,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
