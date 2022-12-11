@@ -1,0 +1,20 @@
+title = "Galleries"
+
+#[galleries]
+[galleries.test_gal1]
+title = "Test Gal1"
+src_imageurl_subdir = "test_gal1"
+home_image_name = ""
+date_updated = 2022-11-28
+
+[galleries.test_gal2]
+title = "Test Gal2"
+src_imageurl_subdir = "test_gal2"
+home_image_name = ""
+date_updated = 2022-11-28
+
+[galleries.house]
+title = "House"
+src_imageurl_subdir = "House"
+home_image_name = "000025.1277975586.png"
+date_updated = 2022-11-28

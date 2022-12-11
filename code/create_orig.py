@@ -7,8 +7,6 @@ import requests
 import json
 from tinydb import TinyDB, Query, where
 from MyDB import MyDB
-from database import build_db, get_images_from_db, clear_image_table
-import sys
 
 import argparse
 import tomli
@@ -78,9 +76,7 @@ remote_image_url = remote_image_url_cloudinary
 N_DESK_COLUMNS = 3
 N_MOBILE_COLUMNS = 1
 
-#image_db_path = "image_db.json"
-image_db_path = "test.db"
-gallery_toml_path = "test_galleries.toml"
+image_db_path = "image_db.json"
 
 # set for default
 image_url = local_image_url
@@ -97,40 +93,39 @@ options:
 
 #mode = "LOCAL"   # or "REMOTE"
 
-#galleries = None
+galleries = None
 
 
 def create_site(gallery_names, mode, show_image_name):
+    init_config()
 
-    # mydb = MyDB(image_db_path)
-    # t_image = mydb.get_table('image')
+    mydb = MyDB(image_db_path)
+    t_image = mydb.get_table('image')
 
-    clear_public()
+    #db = t_image
 
-    galleries, image_t = build_db(gallery_toml_path, image_db_path)
+    # delete all
+    t_image.truncate()
+
 
     print("gallery_names=", gallery_names)
-    print('galleries=', galleries)
 
     if len(gallery_names) == 0 or gallery_names == 'all':
         gallery_list = galleries
     else:
         gallery_list = [gallery for gallery in galleries if gallery['name'] in gallery_names]
     
-    print('====gallery_list_final=', gallery_list)
+    print('gallery_list=', gallery_list)
 
     if len(gallery_list) == 0:
         print("ERROR: need a valid gallery name")
         return
-    
-
-    gallery_list = list(gallery_list.values())
 
     for gallery in gallery_list:
         print("DOING gallery =", gallery['name'])
-        gallery_page(image_t, gallery, mode, show_image_name)
+        gallery_page(t_image, gallery, mode, show_image_name)
     
-    home_page(gallery_list, image_t, mode)
+    ####home_page(db, mode)
     
     copy_dir_contents(css_dir_src, css_dir_dst)
     copy_dir_contents(img_dir_src, img_dir_dst)
@@ -181,11 +176,11 @@ def db_summary():
     #db = TinyDB(image_db_path)
     mydb = MyDB(image_db_path)
     image_t = mydb.get_table('image')
-    gallerie_names = get_galleriy_names(image_t)
+    galleries = get_galleries(image_t)
     total_size = 0
     total_n = 0
-    for gallery_name in gallerie_names:
-        images = image_t.search(where('gallery_name') == gallery_name)
+    for gallery in galleries:
+        images = image_t.search(where('gallery_name') == gallery)
         n = len(images)
         size = sum([image['image_size'] for image in images])
         print(f"Gallery: {gallery}")
@@ -198,16 +193,16 @@ def db_summary():
     print(f"Average file size={total_size / total_n :,.0f}")
 
 
-def get_gallery_names(it):
-    docs = it.all()
-    gallery_names = [doc['gallery_name'] for doc in docs]
-    print("gallery_names=", gallery_names)
-    uniques = list(set(gallery_names))
+def get_galleries(db):
+    docs = db.all()
+    galleries = [doc['gallery_name'] for doc in docs]
+    print("galleries=", galleries)
+    uniques = list(set(galleries))
     print("uniques=", uniques)
     return uniques
 
 
-def gallery_page(it, gallery, mode, show_image_name):
+def gallery_page(db, gallery, mode, show_image_name):
     env = Environment(
         loader=FileSystemLoader("../templates/"),
         autoescape=select_autoescape()
@@ -215,13 +210,10 @@ def gallery_page(it, gallery, mode, show_image_name):
 
     template = env.get_template("gallery.j2")
 
-    imagelist = get_imagelist(it, gallery)
+    imagelist = get_imagelist(gallery)
     print("imagelist=", imagelist)
 
-    # kludge - get n_images into gallery, for use by home_page
-    gallery['n_images'] = len(imagelist)
-
-    #insert_imagelist_into_db(gallery, db, imagelist)
+    insert_imagelist_into_db(gallery, db, imagelist)
 
     n_desk_columns = gallery.get("n_desk_columns", N_DESK_COLUMNS)
     n_mobile_columns = gallery.get("n_mobile_columns", N_MOBILE_COLUMNS)
@@ -254,7 +246,7 @@ def gallery_page(it, gallery, mode, show_image_name):
 
     write_to_file(x, f"gallery_{ gallery['name'] }.html", public_dir)
 
-def home_page(galleries, it, mode):
+def home_page(db, mode):
     env = Environment(
         loader=FileSystemLoader("../templates/"),
         autoescape=select_autoescape()
@@ -262,10 +254,6 @@ def home_page(galleries, it, mode):
 
     template = env.get_template("home.j2")
 
-
-    #gallery_list = list(galleries.values())
-
-    print('home_page galleries=', galleries)
     
 
     n_desk_columns = N_DESK_COLUMNS
@@ -277,7 +265,7 @@ def home_page(galleries, it, mode):
     print("desk_columns", desk_columns)
     print("mobile_columns", mobile_columns)
 
-    #update_galleries_from_db(db, mode)
+    update_galleries_from_db(db, mode)
 
     context = {
         "desk_columns" : desk_columns,
@@ -292,6 +280,15 @@ def home_page(galleries, it, mode):
 
     write_to_file(x, "index.html", public_dir)
 
+def update_galleries_from_db(db, mode):
+    """
+    Get remote url for home image (toc)
+    Get number of files in gallery
+    """
+    for gallery in galleries:
+        gallery['home_image_url_remote'] = get_image_full_url_remote(db, mode, gallery, gallery['src_imageurl_subdir'], gallery['home_image_name'])
+        gallery['n_images'] = get_n_images(db, gallery)
+        print("gallery after updates=", gallery)
 
 def get_image_full_url_remote(db, mode, gallery, subdir, image_name):
     filename = get_remote_image_name(db, gallery, subdir, image_name)
@@ -315,6 +312,22 @@ def get_n_images(db, gallery):
     print("n_images=", len(images))
     return len(images)
 
+def insert_imagelist_into_db(gallery, db, imagelist):
+    for i, image in enumerate(imagelist):
+        rec = {
+            'gallery_name' : gallery['name'],
+            'src_image_name' : image['name'],
+            'src_image_loc' : gallery.get('imageurl_subdir', gallery['src_imageurl_subdir']),
+            'dst_image_name' : get_remote_name(gallery, i),
+            'image_size' : image['size'],
+            'remote_url' : None,
+            'is_active' : True,
+            'flubber' : 'blue',
+        } 
+        print('inserting rec=', rec)
+
+        db.insert(rec)
+
 
 def create_columns(imagelist, n_columns):
     the_columns = []
@@ -337,24 +350,55 @@ def create_columns(imagelist, n_columns):
         col.append(image)
     return the_columns
 
+def get_imagelist_jack(gallery):
+    with open("jack_imagelist.txt", "r") as f:
+        images = f.readlines()
+    images = [{ "name": image.strip(), "title":f"jack_{i}"} for i,image in enumerate(images)]
+    print("images=", images)
+    return images
 
-def get_imagelist(it, gallery):
-    image_recs = get_images_from_db(it, gallery['name'])
+def get_imagelist_swift(gallery):
+    with open("swift_imagelist.txt", "r") as f:
+        images = f.readlines()
+    images = [{ "name": image.strip(), "title":f"swift_{i}"} for i,image in enumerate(images)]
+    print("images=", images)
+    return images
 
-    print('image_recs=', image_recs)
+def get_imagelist_default(gallery):
+    # get list from directory
+    #src_imageurl = gallery['src_imageurl']
+
+    src_imageurl = gallery.get('src_imageurl', SRC_IMAGE_URL)
+
+    src_subdir = gallery['src_imageurl_subdir']
+
+    url = f"{src_imageurl}/images?{src_subdir}"
+    print("url=", url)
+   
+    response = requests.get(url)
+    print("status=", response.status_code)
+    print("text=", response.text)
+
+    print("response=", response)
+
+    if response.status_code != 200:
+        print(f"ERROR: status={response.status_code}")
+        return []
+
+    images = parse_response(response.text)
 
     #images = [{ 'name': image['name'], 'size': image['size'], 'title':f"{gallery['title']}"} for i,image in enumerate(images)]
-    # images = [{ 'name': image['name'], 
-    #     'size': image['size'], 
-    #     'remote_name': get_remote_name(gallery, i),
-    #     'title': f"{gallery['title']} #{i}",
-    #     } for i,image in enumerate(images)]
+    images = [{ 'name': image['name'], 
+        'size': image['size'], 
+        'remote_name': get_remote_name(gallery, i),
+        'title': f"{gallery['title']} #{i}",
+        } for i,image in enumerate(images)]
 
 
-    # print("images=", images)
+    print("images=", images)
 
 
-    return image_recs
+    return images
 
 
 """
@@ -385,21 +429,16 @@ def copy_dir_contents(dir_src, dir_dst):
     print(f"src={dir_src}, dst={dir_dst}")
     shutil.copytree(dir_src, dir_dst, dirs_exist_ok=True)
 
-def clear_public():
-    print('public_dir=', public_dir)
-    #shutil.rmtree(public_dir)
+def get_imagelist(gallery):
 
-
-# def get_imagelist(gallery):
-
-#     #if not gallery.has_key("get_imagelist"):
-#     #   imagelist_name = 'get_imagelist_default'
+    #if not gallery.has_key("get_imagelist"):
+    #   imagelist_name = 'get_imagelist_default'
     
-#     imagelist_name = gallery.get('get_imagelist', 'get_imagelist_default')
+    imagelist_name = gallery.get('get_imagelist', 'get_imagelist_default')
 
-#     #imagelist_name = gallery["get_imagelist"]
-#     images = globals()[imagelist_name](gallery)
-#     return images
+    #imagelist_name = gallery["get_imagelist"]
+    images = globals()[imagelist_name](gallery)
+    return images
 
 def get_image_url(mode):
     if mode == "local":
@@ -416,27 +455,27 @@ def get_image_url_subdir(gallery, mode):
 def get_remote_name(gallery, i):
     return f"{gallery['name']}_{i:03d}"
 
-# def init_config():
-#     with open("galleries.toml", mode="rb") as fp:
-#        config = tomli.load(fp)
-#     print("config =", config)
+def init_config():
+    with open("galleries.toml", mode="rb") as fp:
+       config = tomli.load(fp)
+    print("config =", config)
 
-#     config_galleries = config['galleries']
+    config_galleries = config['galleries']
 
-#     global galleries
-#     galleries = []
+    global galleries
+    galleries = []
 
-#     for name, gallery in config_galleries.items():
-#         print("gallery=", gallery)
-#         gallery['name'] = name
-#         galleries.append(gallery)
-#     print("galleries=", galleries)
+    for name, gallery in config_galleries.items():
+        print("gallery=", gallery)
+        gallery['name'] = name
+        galleries.append(gallery)
+    print("galleries=", galleries)
 
-# def get_gallery(gallery_name):
-#     for gallery in galleries:
-#         if gallery['name'] == gallery_name:
-#             return gallery
-#     return None
+def get_gallery(gallery_name):
+    for gallery in galleries:
+        if gallery['name'] == gallery_name:
+            return gallery
+    return None
 
 def get_image_to_local_file(image):
     src_imageurl = WEB_IMAGE_URL
@@ -472,7 +511,7 @@ def get_image_to_local_file(image):
 
 
 def upload(gallery_name = 'house'):
-    #init_config()
+    init_config()
     #gallery_name = 'house'
     print('gallery_name=', gallery_name)
     gallery_name = 'house'
@@ -493,10 +532,6 @@ def upload(gallery_name = 'house'):
         #assume cloudinary for now
         result = cloudinary_utils.upload_image(image, tmp_file_name)
 
-def clear_db():
-    clear_image_table(image_db_path)
-
-
 def main():
 
     parser = argparse.ArgumentParser(description='Generate static pages')
@@ -507,7 +542,7 @@ def main():
     #                    help='sum the integers (default: find the max)')
 
     #parser.add_argument('--create', action='store_true' )
-    parser.add_argument('operation', choices=['create', 'listdb', 'summary', 'toml', 'copy_to_mac', 'upload', 'clear_db'])  # default='create', nargs='?' )
+    parser.add_argument('operation', choices=['create', 'listdb', 'summary', 'toml', 'copy_to_mac', 'upload'])  # default='create', nargs='?' )
     parser.add_argument('--gallery', default='all', nargs='*')
     parser.add_argument('--mode', choices=['local', 'remote'], default='local', nargs='?')
     parser.add_argument('--show_image_name', action='store_true')
@@ -525,10 +560,8 @@ def main():
         list_db()
     elif args.operation == "summary":
         db_summary()
-    # elif args.operation == "toml":
-    #     init_config()
-    elif args.operation == "clear_db":
-        clear_db()
+    elif args.operation == "toml":
+        init_config()
     elif args.operation == 'copy_to_mac':
         copy_public_to_mac()
     elif args.operation == 'upload':

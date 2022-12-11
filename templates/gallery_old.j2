@@ -1,0 +1,83 @@
+{% extends "base.j2" %}
+
+{% block menu %}
+         <div class="menu">         
+                        <a class="" href="/">home</a>
+                         /
+                        <a class="" href="/about">about</a>
+                </div>
+{% endblock %}
+
+{% block content %}
+
+<div class="gallery-title">
+{{ gallery_title }}
+</div>
+
+<section id="desktop" class="section work">
+	<div class="center hidden-menu">
+    </div>
+	
+
+<div class="columns work-width ">
+{% for column in desk_columns %}
+ <div class="column">
+{% for image in column %}
+       
+                    <div class="center">
+                        <div class="image-box ">
+                            <img
+                            {% if mode == "local" %}
+                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.name }}"
+                            {% else %}
+                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.remote_name }}.png"
+                            {% endif %}
+                            loading="lazy"
+                            width="512"
+                            height="512"
+                            onclick="openSlider();currentSlide( 1 )"
+                            />
+                            <span class="image_title">{{ image.title }}</span>
+                            {% if show_image_name %}
+                            <br /> {{ image.name }}
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+        
+{% endfor %}
+</div>
+{% endfor %}
+     
+</div>
+</section>
+
+<section id="mobile" class="section work">
+	<div class="center hidden-menu">
+    </div>
+	
+
+<div class="columns work-width  is-mobile is-multiline ">
+{% for column in mobile_columns %}
+        <div class="column">
+{% for image in column %}
+                    <div class="center">
+                        <div class="image-box  alittle ">
+                            <img
+                            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.name }}"
+                            loading="lazy"
+                            width="512"
+                            height="512"
+                            onclick="openSlider();currentSlide( 1 )"
+                            />
+                            <span class="image_title">{{ image.title }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    </div>
+                    {% endfor %}
+
+</div>
+</section>
+
+{% endblock %}
