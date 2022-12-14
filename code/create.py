@@ -7,7 +7,7 @@ import requests
 import json
 from tinydb import TinyDB, Query, where
 from MyDB import MyDB
-from database import build_db, get_images_from_db, clear_image_table
+from database import build_db, get_images_from_db, clear_image_table, get_gallery_names_from_db, print_db
 import sys
 import datetime
 
@@ -18,7 +18,7 @@ import tempfile
 
 from jinja2 import Environment, PackageLoader, FileSystemLoader, select_autoescape
 
-from upload import upload_to_cloudinary
+#from upload import upload_to_cloudinary
 
 top = "/home/dg/projects/JCGen/"
 public_dir = os.path.join(top, "public")
@@ -104,6 +104,7 @@ def create_site(gallery_names, mode, show_image_name):
     # t_image = mydb.get_table('image')
 
     clear_public()
+    backup_db(image_db_path)
 
     galleries, image_t = build_db(gallery_toml_path, image_db_path)
 
@@ -170,15 +171,24 @@ def db_summary():
     #db = TinyDB(image_db_path)
     mydb = MyDB(image_db_path)
     image_t = mydb.get_table('image')
-    gallerie_names = get_galleriy_names(image_t)
+    gallery_names = get_gallery_names_from_db(image_t)
     total_size = 0
     total_n = 0
-    for gallery_name in gallerie_names:
+    for gallery_name in gallery_names:
         images = image_t.search(where('gallery_name') == gallery_name)
+
+        fragment = {
+            'gallery_name' : gallery_name,
+            'is_active' : True
+        }
+
+        images_enabled = image_t.search(Query().fragment(fragment))
+        n_enabled = len(images_enabled)
         n = len(images)
         size = sum([image['image_size'] for image in images])
-        print(f"Gallery: {gallery}")
+        print(f"Gallery: {gallery_name}")
         print(f"  n = {n}")
+        print(f'    n_enabled = {n_enabled}')
         print(f"  size = {size:,} bytes ({size / 1000000 :.1f} mb)")
         total_size += size
         total_n += n
@@ -187,13 +197,14 @@ def db_summary():
     print(f"Average file size={total_size / total_n :,.0f}")
 
 
-def get_gallery_names(it):
-    docs = it.all()
-    gallery_names = [doc['gallery_name'] for doc in docs]
-    print("gallery_names=", gallery_names)
-    uniques = list(set(gallery_names))
-    print("uniques=", uniques)
-    return uniques
+
+# def get_gallery_names(it):
+#     docs = it.all()
+#     gallery_names = [doc['gallery_name'] for doc in docs]
+#     print("gallery_names=", gallery_names)
+#     uniques = list(set(gallery_names))
+#     print("uniques=", uniques)
+#     return uniques
 
 
 def gallery_page(it, gallery, mode, show_image_name):
@@ -280,7 +291,9 @@ def get_image_full_url_remote(db, mode, gallery, subdir, image_name):
     
 def get_remote_image_name(db, gallery, subdir, image_name):
     fragment = {
-        'gallery_name': gallery['name'], 'src_image_name': image_name, 'src_image_loc' : subdir 
+        'gallery_name': gallery['name'], 
+        'src_image_name': image_name, 
+        'src_image_loc' : subdir 
     }
 
     images = db.search(Query().fragment(fragment))
@@ -392,11 +405,26 @@ def clear_public():
 
     print(f'Moved public to {dest}')
 
+    # make new empty public dir
     os.mkdir(public_dir)
 
 
 def clear_db():
+    backup_db(image_db_path)
     clear_image_table(image_db_path)
+
+def backup_db(db_path):
+    src_path = image_db_path
+    src_file = os.path.basename(src_path)
+    dst_dir = Path(backup_dir) / 'db'
+
+    now = datetime.datetime.now()
+    ts = int (datetime.datetime.timestamp(now))
+
+    dest = Path(dst_dir) / f'{src_file}_{ts}'
+    print(f'src_path={src_path}, src_file={src_file}, dst={dest}')
+
+    shutil.copyfile(src_path, dest)
 
 
 def main():

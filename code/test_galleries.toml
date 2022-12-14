@@ -1,6 +1,6 @@
 title = "Galleries"
 
-#[galleries]
+# [galleries]
 # [galleries.test_gal1]
 # title = "Test Gal1"
 # src_imageurl_subdir = "test_gal1"

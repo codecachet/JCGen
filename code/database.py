@@ -158,7 +158,13 @@ def get_default_image_title(gallery, next_index):
 def get_next_index(it, gallery):
     images = it.search(where('gallery_name') == gallery['name'])
     print("n_images=", len(images))
-    return len(images)
+    
+    next_index = 0
+    for image in images:
+        if image['image_number'] > next_index:
+            next_index = image['image_number']
+    
+    return next_index + 1
 
 def get_galleries(toml_file_path):
     with open(toml_file_path, mode="rb") as fp:
@@ -225,7 +231,7 @@ def print_db(table):
         pass
 
     # do it by gallery, sorted by dst_image_name
-    galleries = get_galleries_from_db(recs)
+    galleries = get_gallery_names_from_docs(recs)
 
     print("galleries=", galleries)
 
@@ -236,7 +242,7 @@ def print_db(table):
         recs.sort(key=lambda x: x['dst_image_name'])
         print('recs AFTER sort=', [ (rec['dst_image_name'], rec['is_active']) for rec in recs] )
 
-def get_galleries_from_db(docs):
+def get_gallery_names_from_docs(docs):
 
     print("docs=", docs)
     
@@ -245,6 +251,10 @@ def get_galleries_from_db(docs):
     uniques = list(set(galleries))
     print("uniques=", uniques)
     return uniques
+
+def get_gallery_names_from_db(it):
+    recs = it.all()
+    return get_gallery_names_from_docs(recs)
 
 def get_images_from_db(it, gallery_name):
     print("serach for gallery_name=", gallery_name)
