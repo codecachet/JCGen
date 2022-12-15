@@ -4,7 +4,7 @@
          <div class="menu">         
                         <a class="active" href="/">home</a>
                          /
-                        <a class="" href="/about">about</a>
+                        <a class="" href="/about.html">about</a>
                 </div>
 {% endblock %}
 
@@ -31,7 +31,7 @@ Galleries
                                 {% if mode == "local" %}
                                 src="{{ imageurl }}/{{ gallery.src_imageurl_subdir }}/{{ gallery.home_image_name }}"
                                 {% else %}
-                                src="{{ imageurl }}/{{ mode }}/{{ gallery.home_image_name }}"
+                                src="{{ gallery.remote_home_image_url }}"
                                 {% endif %}
 
                                 {# src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}" #}
@@ -74,7 +74,7 @@ Galleries
                                 {% if mode == "local" %}
                                 src="{{ imageurl }}/{{ gallery.src_imageurl_subdir }}/{{ gallery.home_image_name }}"
                                 {% else %}
-                                src="{{ imageurl }}/{{ mode }}/{{ gallery.home_image_name }}"
+                                src="{{ gallery.remote_home_image_url }}"
                                 {% endif %}
 
                                 {# src="{{ gallery.imageurl }}/{{ gallery.imageurl_subdir }}/{{ gallery.home_image_name }}" #}

@@ -129,6 +129,8 @@ def create_site(gallery_names, mode, show_image_name):
         gallery_page(image_t, gallery, mode, show_image_name)
     
     home_page(gallery_list, image_t, mode)
+
+    about_page()
     
     copy_dir_contents(css_dir_src, css_dir_dst)
     copy_dir_contents(img_dir_src, img_dir_dst)
@@ -284,6 +286,26 @@ def home_page(galleries, it, mode):
     #print("x=", x)
 
     write_to_file(x, "index.html", public_dir)
+
+
+def about_page():
+    env = Environment(
+        loader=FileSystemLoader("../templates/"),
+        autoescape=select_autoescape()
+    )
+
+    template = env.get_template("about.j2")
+
+    
+
+    context = {
+     
+    }
+
+    x = template.render(context)
+    #print("x=", x)
+
+    write_to_file(x, "about.html", public_dir)
 
 
 def get_image_full_url_remote(db, mode, gallery, subdir, image_name):

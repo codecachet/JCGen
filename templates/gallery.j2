@@ -4,7 +4,7 @@
          <div class="menu">         
                         <a class="" href="/">home</a>
                          /
-                        <a class="" href="/about">about</a>
+                        <a class="" href="/about.html">about</a>
                 </div>
 {% endblock %}
 
@@ -30,7 +30,7 @@
             {% if mode == "local" %}
             src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.src_image_name}}"
             {% else %}
-            src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.dst_image_name }}.png"
+            src="{{ image.remote_url }}"
             {% endif %}
             loading="lazy"
             width="512"
@@ -64,7 +64,11 @@
     <div class="center">
         <div class="image-box  alittle ">
             <img
+            {% if mode == "local" %}
             src="{{ imageurl }}/{{ imageurl_subdir }}/{{ image.src_image_name }}"
+            {% else %}
+            src="{{ image.remote_url }}"
+            {% endif %}
             loading="lazy"
             width="512"
             height="512"
