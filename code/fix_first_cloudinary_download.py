@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+## NOTE: this is a one-off
+## I had updated cloudinary somewhat manually, and am now copying the status into the iserver table from the results on console.
+
+
 from pathlib import Path
 import os
 import json
@@ -43,7 +47,7 @@ def read_file():
 
     return assets
 
-def fixit():
+def update_iserver_table():
     assets = read_file()
     db = MyDB(image_db_path)
     iserver_t = db.get_table('iserver')
@@ -70,6 +74,8 @@ def update_image_table():
     image_t = db.get_table('image')
     iserver_t = db.get_table('iserver')
 
+    # NOTE: house was inserted into cloudinary with names house_000 .... house_0019
+
     irecs = iserver_t.all()
     for irec in irecs:
         print(f'gallery={irec["gallery"]}, image_name={irec["image_name"]}, url={irec["upload_result"]["secure_url"]}')
@@ -82,10 +88,14 @@ def update_image_table():
 
         rec = image_t.search(Query().fragment(fragment))
 
-        print('rec=', rec)
+        print(f'fragment={fragment}, rec={rec}')
         #rec['remote_url'] = irec["upload_result"]["secure_url"]
+        
+        remote_url = irec["upload_result"]["secure_url"]
+        print('remote_url=', remote_url)
 
-        image_t.update({'remote_url' : irec["upload_result"]["secure_url"] } , Query().fragment(fragment))
+        status = image_t.update({'remote_url' : remote_url } , Query().fragment(fragment))
+        print('status=', status)
 
 def show_results():
     db = MyDB(image_db_path)
@@ -98,7 +108,7 @@ def show_results():
 
 
 if __name__ == '__main__':
-    #fixit()
+    update_iserver_table()
 
     update_image_table()
 

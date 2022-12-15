@@ -220,6 +220,7 @@ def gallery_page(it, gallery, mode, show_image_name):
 
     # kludge - get n_images into gallery, for use by home_page
     gallery['n_images'] = len(imagelist)
+    gallery['remote_home_image_url'] = get_remote_home_image_url(it, gallery)
 
     #insert_imagelist_into_db(gallery, db, imagelist)
 
@@ -303,6 +304,21 @@ def get_remote_image_name(db, gallery, subdir, image_name):
         print("ERROR: found multiple images, images=", images)
         return None
     return images[0]['dst_image_name']
+
+def get_remote_home_image_url(it, gallery):
+    fragment = {
+        'gallery_name' : gallery['name'],
+        'src_image_name' : gallery['home_image_name'],
+        'src_image_loc' : gallery['src_imageurl_subdir'],
+    }
+    images = it.search(Query().fragment(fragment))
+    
+    if len(images) == 0:
+        print("ERROR: cannot find image for home image, fragment=", fragment)
+        return None
+    image = images[0]
+    return image['remote_url']
+
 
 def get_n_images(db, gallery):
     images = db.search(where('gallery_name') == gallery['name'])

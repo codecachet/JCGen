@@ -159,7 +159,7 @@ def get_next_index(it, gallery):
     images = it.search(where('gallery_name') == gallery['name'])
     print("n_images=", len(images))
     
-    next_index = 0
+    next_index = -1
     for image in images:
         if image['image_number'] > next_index:
             next_index = image['image_number']
