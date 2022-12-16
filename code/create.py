@@ -5,6 +5,7 @@ import shutil
 import json
 from tinydb import TinyDB, Query, where
 import datetime
+import sys
 
 import argparse
 from pathlib import Path
@@ -96,23 +97,37 @@ options:
 
 """
 
+"""
+./create.py create --mode remote --gallery house spacewar2
+
+"""
+
 def create_site(gallery_names, mode, show_image_name):
 
     # mydb = MyDB(image_db_path)
     # t_image = mydb.get_table('image')
+
+    print('gallery_names', gallery_names)
 
     clear_public()
     backup_db(image_db_path)
 
     galleries, image_t = build_db(gallery_toml_path, image_db_path)
 
+    # note: galleries is a dict, indexed by name
+
     print("gallery_names=", gallery_names)
     print('galleries=', galleries)
 
     if len(gallery_names) == 0 or gallery_names == 'all':
         gallery_list = galleries
+        gallery_list = list(gallery_list.values())
     else:
-        gallery_list = [gallery for gallery in galleries if gallery['name'] in gallery_names]
+        gallery_list = []
+        for name in galleries.keys():
+            if name in gallery_names:
+                gallery_list.append(galleries[name])
+        #gallery_list = [gallery[] for gallery in galleries if gallery['name'] in gallery_names]
     
     print('====gallery_list_final=', gallery_list)
 
@@ -120,7 +135,7 @@ def create_site(gallery_names, mode, show_image_name):
         print("ERROR: need a valid gallery name")
         return
     
-    gallery_list = list(gallery_list.values())
+    
 
     for gallery in gallery_list:
         print("DOING gallery =", gallery['name'])
