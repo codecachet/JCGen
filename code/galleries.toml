@@ -19,11 +19,11 @@ src_imageurl_subdir = "House"
 home_image_name = "000025.1277975586.png"
 date_updated = 2022-11-28
 
-[galleries.spacewar]
-title = "SpaceWar"
-src_imageurl_subdir = "SpaceWar"
-home_image_name = "000112.2344471161.png"
-date_updated = 2022-11-28
+# [galleries.spacewar]
+# title = "SpaceWar"
+# src_imageurl_subdir = "SpaceWar"
+# home_image_name = "000112.2344471161.png"
+# date_updated = 2022-11-28
 
 [galleries.watches]
 title = "Watches"

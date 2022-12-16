@@ -256,7 +256,7 @@ def get_gallery_names_from_db(it):
     recs = it.all()
     return get_gallery_names_from_docs(recs)
 
-def get_images_from_db(it, gallery_name):
+def get_images_from_db_active(it, gallery_name):
     print("serach for gallery_name=", gallery_name)
     # get is_active only?????? %%%
     Image = Query()

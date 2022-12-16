@@ -2,23 +2,21 @@
 
 import os
 import shutil
-import requests 
-#from bs4 import BeautifulSoup
 import json
 from tinydb import TinyDB, Query, where
-from MyDB import MyDB
-from database import build_db, get_images_from_db, clear_image_table, get_gallery_names_from_db, print_db
-import sys
 import datetime
 
 import argparse
-import tomli
 from pathlib import Path
-import tempfile
 
 from jinja2 import Environment, PackageLoader, FileSystemLoader, select_autoescape
 
-#from upload import upload_to_cloudinary
+from dotenv import load_dotenv
+load_dotenv()
+
+from MyDB import MyDB
+from database import build_db, get_images_from_db_active, clear_image_table, get_gallery_names_from_db, print_db
+from upload import upload_to_cloudinary
 
 top = "/home/dg/projects/JCGen/"
 public_dir = os.path.join(top, "public")
@@ -80,10 +78,10 @@ remote_image_url = remote_image_url_cloudinary
 N_DESK_COLUMNS = 3
 N_MOBILE_COLUMNS = 1
 
-#image_db_path = "image_db.json"
-image_db_path = "test.db"
-gallery_toml_path = "test_galleries.toml"
-#gallery_toml_path = "galleries.toml"
+image_db_path = "image_db.json"
+#image_db_path = "test.db"
+#gallery_toml_path = "test_galleries.toml"
+gallery_toml_path = "galleries.toml"
 
 # set for default
 image_url = local_image_url
@@ -154,11 +152,17 @@ def copy_public_to_mac():
     for file in dst_public.iterdir():
         print(f"file={file}")
 
-def list_db(table_name='image'):
+def list_db(table_name='image', gallery_name='spacewar2'):
     #db = TinyDB(image_db_path)
     mydb = MyDB(image_db_path)
     image_t = mydb.get_table(table_name)
-    docs = image_t.all()
+    if gallery_name == 'all':
+        docs = image_t.all()
+    else:
+        fragment = {
+            'gallery_name' : gallery_name
+        }
+        docs = image_t.search(Query().fragment(fragment))
     for doc in docs:
         print("doc=", doc)
 
@@ -369,7 +373,7 @@ def create_columns(imagelist, n_columns):
 
 
 def get_imagelist(it, gallery):
-    image_recs = get_images_from_db(it, gallery['name'])
+    image_recs = get_images_from_db_active(it, gallery['name'])
 
     print('image_recs=', image_recs)
 
@@ -415,10 +419,10 @@ def upload(gallery_names):
     iserver_t = db.get_table('iserver')
 
     if gallery_names == 'all':
-        gallery_names = get_gallery_names(image_t)
+        gallery_names = get_gallery_names_from_db(image_t)
     
     for gallery_name in gallery_names:
-        image_recs = get_images_from_db(image_t, gallery_name)
+        image_recs = get_images_from_db_active(image_t, gallery_name)
         upload_to_cloudinary(image_t, iserver_t, WEB_IMAGE_URL, image_recs)
     
 

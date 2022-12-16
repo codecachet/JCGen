@@ -12,6 +12,11 @@ import datetime
 from MyDB import MyDB
 
 from tinydb import TinyDB, Query, where
+from cloudinary.utils import cloudinary_url
+import cloudinary
+
+from dotenv import load_dotenv
+load_dotenv()
 
 
 top = Path("~/projects/JCGen").expanduser()
@@ -20,7 +25,8 @@ text_file = Path(top) / 'code' / 'cloudinary_house_init.txt'
 
 gallery_name = 'house'
 
-image_db_path = "test.db"
+#image_db_path = "test.db"
+image_db_path = "image_db.json"
 
 def read_file():
     print('text_file=', text_file)
@@ -106,10 +112,44 @@ def show_results():
     for image in images:
         print(image)
 
+def check_cloudinary_url_builder():
+
+    load_dotenv()
+
+    cloudinary.config( 
+        cloud_name = "jumpingcow", 
+        api_key = "874837483274837", 
+        api_secret = "a676b67565c6767a6767d6767f676fe1",
+        secure = True
+    )
+
+    db = MyDB(image_db_path)
+    image_t = db.get_table('image')
+    iserver_t = db.get_table('iserver')
+
+    irecs = iserver_t.all()
+
+    for irec in irecs:
+        result = irec['upload_result']
+
+
+
+        results = json.dumps(result)
+
+        url, options = cloudinary_url(result['public_id'], format=result['format'])
+
+        print('result=', result)
+        print('url=', url)
+        
+        print('options=', options)
+
+
 
 if __name__ == '__main__':
-    update_iserver_table()
+    #update_iserver_table()
 
-    update_image_table()
+    #update_image_table()
 
-    show_results()
+    #show_results()
+
+    check_cloudinary_url_builder()
