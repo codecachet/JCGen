@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from MyDB import MyDB
-from database import build_db, get_images_from_db_active, clear_image_table, get_gallery_names_from_db, print_db
+from database import build_db, get_images_from_db_active, clear_image_table, get_gallery_names_from_db, print_db, get_galleries
 from upload import upload_to_cloudinary
 
 top = "/home/dg/projects/JCGen/"
@@ -433,14 +433,24 @@ def upload(gallery_names):
     image_t = db.get_table('image')
     iserver_t = db.get_table('iserver')
 
-    if gallery_names == 'all':
+    print('gallery_names init', gallery_names)
+    if len(gallery_names) == 0:
+        print("Need to enter gallery names, or all")
+        return
+
+    if gallery_names[0] == 'all_db':
         gallery_names = get_gallery_names_from_db(image_t)
+    elif gallery_names[0] == 'all':
+        gallery_names = get_gallery_names_from_toml()
+    print('gallery_names=', gallery_names)
     
     for gallery_name in gallery_names:
         image_recs = get_images_from_db_active(image_t, gallery_name)
         upload_to_cloudinary(image_t, iserver_t, WEB_IMAGE_URL, image_recs)
     
-
+def get_gallery_names_from_toml():
+    galleries = get_galleries(gallery_toml_path)
+    return list(galleries.keys())
     
 def clear_public():
     #print('public_dir=', public_dir)
